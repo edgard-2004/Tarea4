@@ -1,0 +1,49 @@
+﻿@page "/"
+<h1 class="text-center">Dashboard</h1>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card text-white bg-primary mb-3">
+                <div class="card-header">Libros</div>
+                <div class="card-body">
+                    <h5 class="card-title">@listaclase.Count(x => x.Tipo == TipoEntidad.Libro)</h5>
+                    <p class="card-text">Total de libros registrados.</p>
+                    <a href="/entidad/libros" class="btn btn-light">Ver Libros</a>
+                    <a href="/entidad/libros/editar" class="btn btn-light">Agregar Libro</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-danger mb-3">
+                <div class="card-header">Películas</div>
+                <div class="card-body">
+                    <h5 class="card-title">@listaclase.Count(x => x.Tipo == TipoEntidad.Pelicula)</h5>
+                    <p class="card-text">Total de películas registradas.</p>
+                    <a href="/entidad/peliculas" class="btn btn-light">Ver Películas</a>
+                    <a href="/entidad/peliculas/editar" class="btn btn-light">Agregar Película</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-header">Series</div>
+                <div class="card-body">
+                    <h5 class="card-title">@listaclase.Count(x => x.Tipo == TipoEntidad.Serie)</h5>
+                    <p class="card-text">Total de series registradas.</p>
+                    <a href="/entidad/series" class="btn btn-light">Ver Series</a>
+                    <a href="/entidad/series/editar" class="btn btn-light">Agregar Serie</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<SeriePeliculaLibro> listaclase = new List<SeriePeliculaLibro>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        listaclase = await Sc.SeriePeliculaLibros.ToListAsync();
+    }
+}

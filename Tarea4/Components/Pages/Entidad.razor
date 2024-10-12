@@ -1,0 +1,99 @@
+@page "/entidad/{tipo}"
+@rendermode InteractiveServer
+<h3 class="text-primary">Entidad @tipo</h3>
+
+<div class="text-end mb-3">
+    <button type="button" class="btn btn-primary" @onclick="agregarNuevo">
+        <i class="fas fa-plus"></i> Agregar
+    </button>
+</div>
+
+<h3 class="text-secondary">Agregados</h3>
+
+<table class="table table-striped table-hover">
+    <thead class="thead-dark">
+        <tr>
+            <th>Nombre</th>
+            <th>País</th>
+            <th>Idioma</th>
+            <th>Protagonista</th>
+            <th>Foto</th>
+            <th>Resumen</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in listaclase)
+        {
+            <tr>
+                <td>@item.Nombre</td>
+                <td>@item.Pais</td>
+                <td>@item.Idioma</td>
+                <td>@item.personajes.Count</td>
+                <td>
+                    <img src="@item.FotoUrl" alt="@item.Nombre" class="rounded" style="width: 100px; height: auto; object-fit: cover;">
+                </td>
+                <td>
+                @(item.Resumen != null ? (item.Resumen.Length > 100 ? item.Resumen.Substring(0, 100) + "..." : item.Resumen) : "Sin resumen disponible")
+                </td>
+                <td>
+                    <button type="submit" class="btn btn-warning btn-sm me-2" @onclick="() => editarRegistro(item.Id)">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+                    <button type="submit" class="btn btn-danger btn-sm" @onclick="() => eliminarRegistro(item.Id)">
+                        <i class="fas fa-trash-alt"></i> Eliminar
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@code
+{
+    [Parameter] public string tipo { get; set; } = string.Empty;
+    List<SeriePeliculaLibro> listaclase = new List<SeriePeliculaLibro>();
+
+    TipoEntidad tipoEntidad;
+
+    private void agregarNuevo()
+    {
+        NavMan.NavigateTo($"entidad/{tipo}/editar");
+    }
+
+    private void editarRegistro(int id)
+    {
+        NavMan.NavigateTo($"/entidad/{tipo}/editar/{id}");
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        switch (tipo)
+        {
+            case "Libros":
+                tipoEntidad = TipoEntidad.Libro;
+                break;
+            case "Peliculas":
+                tipoEntidad = TipoEntidad.Pelicula;
+                break;
+            case "Series":
+                tipoEntidad = TipoEntidad.Serie;
+                break;
+        }
+
+        listaclase = await Sc.SeriePeliculaLibros.Where(x => x.Tipo == tipoEntidad).ToListAsync();
+        StateHasChanged();
+    }
+
+    private async Task eliminarRegistro(int id)
+    {
+        var entidadEliminar = await Sc.SeriePeliculaLibros.FirstOrDefaultAsync(p => p.Id == id);
+
+        if (entidadEliminar != null)
+        {
+            Sc.SeriePeliculaLibros.Remove(entidadEliminar);
+            await Sc.SaveChangesAsync();
+            listaclase.Remove(entidadEliminar);
+            StateHasChanged();
+        }
+    }
+}
